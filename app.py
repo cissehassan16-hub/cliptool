@@ -6,7 +6,7 @@ import json
 import uuid
 import glob
 
-app = Flask(__name__, static_folder='.')
+app = Flask(__name__, static_folder='.', static_url_path='')
 CORS(app)
 
 DOWNLOADS_DIR = os.path.join(os.path.dirname(__file__), 'downloads')
