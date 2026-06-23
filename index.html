@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ClipTool</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="logo">
+      <span class="logo-bracket">[</span>
+      <span class="logo-text">CLIP</span>
+      <span class="logo-accent">TOOL</span>
+      <span class="logo-bracket">]</span>
+    </div>
+    <div class="header-tag">Usage personnel</div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- STEP 1: URL Input -->
+    <section class="section" id="section-import">
+      <div class="step-label">01 — IMPORTER</div>
+      <h2 class="section-title">Colle ton lien vidéo</h2>
+      <p class="section-sub">YouTube · TikTok · Instagram · Twitter · Facebook · et plus</p>
+
+      <div class="url-box">
+        <input
+          type="text"
+          id="url-input"
+          class="url-input"
+          placeholder="https://www.youtube.com/watch?v=..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="btn-primary" id="btn-download" onclick="startDownload()">
+          <span id="btn-download-text">Charger</span>
+          <span id="btn-download-spinner" class="spinner hidden"></span>
+        </button>
+      </div>
+
+      <div id="error-msg" class="error-msg hidden"></div>
+    </section>
+
+    <!-- STEP 2: Video Preview + Clipping -->
+    <section class="section hidden" id="section-editor">
+      <div class="step-label">02 — DÉCOUPER</div>
+
+      <div class="video-info" id="video-info">
+        <div class="video-info-platform" id="info-platform">—</div>
+        <div class="video-info-title" id="info-title">Titre de la vidéo</div>
+        <div class="video-info-duration" id="info-duration">0:00</div>
+      </div>
+
+      <div class="player-wrap">
+        <video id="video-player" class="video-player" controls preload="metadata">
+          Votre navigateur ne supporte pas la lecture vidéo.
+        </video>
+      </div>
+
+      <!-- Segments -->
+      <div class="segments-header">
+        <h3 class="segments-title">Segments à découper</h3>
+        <button class="btn-add" onclick="addSegment()">+ Ajouter</button>
+      </div>
+
+      <div id="segments-list" class="segments-list">
+        <!-- Segments injectés par JS -->
+      </div>
+
+      <div class="actions-bar">
+        <button class="btn-secondary" onclick="resetAll()">↩ Recommencer</button>
+        <button class="btn-primary" id="btn-clip" onclick="startClipping()">
+          <span id="btn-clip-text">Découper</span>
+          <span id="btn-clip-spinner" class="spinner hidden"></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- STEP 3: Results -->
+    <section class="section hidden" id="section-results">
+      <div class="step-label">03 — TÉLÉCHARGER</div>
+      <h2 class="section-title">Tes clips sont prêts</h2>
+
+      <div id="clips-list" class="clips-list"></div>
+
+      <div class="actions-bar" style="margin-top:2rem">
+        <button class="btn-secondary" onclick="backToEditor()">↩ Retravailler</button>
+        <button class="btn-primary" onclick="resetAll()">Nouvelle vidéo</button>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
