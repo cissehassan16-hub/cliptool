@@ -38,6 +38,7 @@ def download_video():
             'yt-dlp',
             '--dump-json',
             '--no-playlist',
+            '--cookies', '/app/cookies.txt',
             url
         ]
         info_result = subprocess.run(info_cmd, capture_output=True, text=True, timeout=30)
@@ -58,6 +59,7 @@ def download_video():
             'yt-dlp',
             '-f', 'bestvideo+bestaudio/best',
             '--no-playlist',
+            '--cookies', '/app/cookies.txt',
             '-o', raw_template,
             '--merge-output-format', 'mp4',
             url
