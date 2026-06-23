@@ -50,27 +50,52 @@ def download_video():
         duration = info.get('duration', 0)
         platform = info.get('extractor_key', 'Unknown')
 
-        # Download best quality
+        # Download + re-encode H264 pour compatibilité navigateur
+        raw_template = os.path.join(DOWNLOADS_DIR, f'{video_id}_raw.%(ext)s')
+        final_path = os.path.join(DOWNLOADS_DIR, f'{video_id}.mp4')
+
         dl_cmd = [
             'yt-dlp',
-            '-f', 'bestvideo[ext=mp4]+bestaudio[ext=m4a]/bestvideo+bestaudio/best',
-            '--merge-output-format', 'mp4',
+            '-f', 'bestvideo+bestaudio/best',
             '--no-playlist',
-            '-o', output_template,
+            '-o', raw_template,
+            '--merge-output-format', 'mp4',
             url
         ]
-        dl_result = subprocess.run(dl_cmd, capture_output=True, text=True, timeout=300)
+        dl_result = subprocess.run(dl_cmd, capture_output=True, text=True, timeout=600)
 
         if dl_result.returncode != 0:
             return jsonify({'error': 'Échec du téléchargement. La vidéo est peut-être privée.'}), 400
 
-        # Find downloaded file
-        files = glob.glob(os.path.join(DOWNLOADS_DIR, f'{video_id}.*'))
-        if not files:
+        # Find raw downloaded file
+        raw_files = glob.glob(os.path.join(DOWNLOADS_DIR, f'{video_id}_raw.*'))
+        if not raw_files:
             return jsonify({'error': 'Fichier introuvable après téléchargement'}), 500
 
-        video_path = files[0]
-        filename = os.path.basename(video_path)
+        raw_path = raw_files[0]
+
+        # Re-encode to H264 + AAC for browser compatibility
+        encode_cmd = [
+            'ffmpeg',
+            '-i', raw_path,
+            '-c:v', 'libx264',
+            '-preset', 'fast',
+            '-crf', '23',
+            '-c:a', 'aac',
+            '-movflags', '+faststart',
+            '-y',
+            final_path
+        ]
+        encode_result = subprocess.run(encode_cmd, capture_output=True, text=True, timeout=600)
+
+        # Cleanup raw file
+        if os.path.exists(raw_path):
+            os.remove(raw_path)
+
+        if encode_result.returncode != 0 or not os.path.exists(final_path):
+            return jsonify({'error': 'Erreur lors de la conversion vidéo'}), 500
+
+        filename = f'{video_id}.mp4'
 
         return jsonify({
             'success': True,
@@ -131,8 +156,11 @@ def clip_video():
             cmd += ['-to', str(end)]
 
         cmd += [
-            '-c', 'copy',
-            '-avoid_negative_ts', 'make_zero',
+            '-c:v', 'libx264',
+            '-preset', 'fast',
+            '-crf', '23',
+            '-c:a', 'aac',
+            '-movflags', '+faststart',
             '-y',
             clip_path
         ]
