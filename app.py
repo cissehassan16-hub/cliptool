@@ -6,7 +6,7 @@ import json
 import uuid
 import glob
 
-app = Flask(__name__, static_folder='static')
+app = Flask(__name__, static_folder='.')
 CORS(app)
 
 DOWNLOADS_DIR = os.path.join(os.path.dirname(__file__), 'downloads')
@@ -18,7 +18,7 @@ os.makedirs(CLIPS_DIR, exist_ok=True)
 
 @app.route('/')
 def index():
-    return send_from_directory('static', 'index.html')
+    return send_from_directory('.', 'index.html')
 
 
 @app.route('/api/download', methods=['POST'])
